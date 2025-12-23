@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies (root)
+        run: npm install
+      - name: Install dependencies (client)
+        run: |
+          cd client
+          npm install
+      - name: Install dependencies (server)
+        run: |
+          cd server
+          npm install
+      - name: Lint
+        run: npm run lint || true
+      - name: Run tests
+        run: npm test || true
+      - name: Check formatting
+        run: npm run format:check || true

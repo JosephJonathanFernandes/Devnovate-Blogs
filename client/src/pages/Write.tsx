@@ -128,39 +128,41 @@ const Write = () => {
     e.preventDefault();
     setIsDragOver(false);
     
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      await handleImageUpload(imageFile);
-    } else {
-      toast({
-        title: "Invalid file type",
-        description: "Please drop an image file",
-        variant: "destructive",
-      });
-    }
+
+    import { useEffect, useState } from "react";
+    import { useNavigate } from "react-router-dom";
+    import Header from "@/components/Header";
+    import { Input } from "@/components/ui/input";
+    import { Textarea } from "@/components/ui/textarea";
+    import { Label } from "@/components/ui/label";
+    import { useAppContext } from "@/context/AppContext";
+    import { useWriteArticle } from "@/hooks/useWriteArticle";
+    import { TagInput } from "@/components/TagInput";
+    import { ImageUploadToolbar } from "@/components/ImageUploadToolbar";
+    import { MarkdownEditor } from "@/components/MarkdownEditor";
+    import { WriteSidebar } from "@/components/WriteSidebar";
+    import { ImageHelpCard } from "@/components/ImageHelpCard";
+    import { GuidelinesCard } from "@/components/GuidelinesCard";
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleSaveDraft = async () => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to save drafts.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const Write = () => {
+      const {
+        title, setTitle,
+        excerpt, setExcerpt,
+        content, setContent,
+        tags, setTags,
+        currentTag, setCurrentTag,
+        featuredImage, setFeaturedImage,
+        isSubmitting, setIsSubmitting,
+        uploadingImage, setUploadingImage,
+        isDragOver, setIsDragOver,
+        addTag, removeTag,
+        handleImageUpload,
+        toast,
+      } = useWriteArticle();
+      const [activeTab, setActiveTab] = useState("edit");
+      const { isLoggedIn, user, loading } = useAppContext();
+      const navigate = useNavigate();
 
     if (!title.trim() || !content.trim() || !excerpt.trim()) {
       toast({
@@ -174,19 +176,41 @@ const Write = () => {
     setIsSubmitting(true);
     try {
       const blogData = {
-        title: title.trim(),
-        excerpt: excerpt.trim(),
-        content: content.trim(),
-        tags,
-        featured_image: featuredImage.trim() || undefined,
+
+      // File/image upload handlers
+      const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          handleImageUpload(file);
+        }
+        e.target.value = '';
       };
 
-      const response = await apiClient.post('/blogs', blogData);
-      
-      if (response.data.success) {
-        toast({
-          title: "Draft saved",
-          description: "Your article has been saved as a draft and is pending review.",
+      const handleDrop = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const files = Array.from(e.dataTransfer.files);
+        const imageFile = files.find(file => file.type.startsWith('image/'));
+        if (imageFile) {
+          await handleImageUpload(imageFile);
+        } else {
+          toast({
+            title: "Invalid file type",
+            description: "Please drop an image file",
+            variant: "destructive",
+          });
+        }
+      };
+
+      const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      };
+
+      const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+      };
         });
         // Clear form or navigate as needed
         setTitle("");

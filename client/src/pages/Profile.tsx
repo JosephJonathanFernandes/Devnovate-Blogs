@@ -106,279 +106,72 @@ const Profile = () => {
       if (!isLoggedIn) return;
       
       try {
-        axios.defaults.withCredentials = true;
-        const response = await axios.get(`${backendUrl}/blogs/my-blogs`);
-        
-        if (response.data.success) {
-          setUserBlogs(response.data.blogs);
-        }
-      } catch (error: unknown) {
-        console.error('Error fetching user blogs:', error);
-      }
-    };
 
-    fetchUserBlogs();
-  }, [isLoggedIn, backendUrl]);
+        import { useNavigate, Link } from "react-router-dom";
+        import Header from "@/components/Header";
+        import { Button } from "@/components/ui/button";
+        import { Card } from "@/components/ui/card";
+        import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+        import { Edit, Eye, Heart, Loader2 } from "lucide-react";
+        import BlogCard from "@/components/BlogCard";
+        import { useProfileData } from "@/hooks/useProfileData";
+        import { ProfileHeader } from "@/components/ProfileHeader";
+        import { StatusBadge } from "@/components/StatusBadge";
 
-  // Create user object with fallbacks to dummy data
-  const displayUser = {
-    name: profileData?.name || user?.name || "John Doe",
-    email: profileData?.email || user?.email || "john.doe@example.com",
-    bio: profileData?.bio || "",
-    joinedDate: profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "January 2024",
-    location: profileData?.location || "",
-    website: profileData?.website || "",
-    isAdmin: profileData?.isAdmin || false,
-    stats: {
-      articles: profileData?.stats?.articles || 0,
-      totalBlogs: profileData?.stats?.totalBlogs || 0,
-      followers: profileData?.stats?.followers || 0,
-      following: profileData?.stats?.following || 0,
-      totalViews: profileData?.stats?.totalViews || 0,
-      totalLikes: profileData?.stats?.totalLikes || 0
-    }
-  };
+        const Profile = () => {
+          const { profileData, userBlogs, loading, isLoggedIn, user } = useProfileData();
+          const navigate = useNavigate();
 
-  // Separate blogs by status
-  const publishedArticles = userBlogs.filter(blog => blog.status === 'approved');
-  const draftArticles = userBlogs.filter(blog => blog.status === 'pending');
-  const rejectedArticles = userBlogs.filter(blog => blog.status === 'rejected');
+          if (!isLoggedIn) {
+            return null;
+          }
 
-  // Status badge component
-  const StatusBadge = ({ status }: { status: string }) => {
-    const statusConfig = {
-      pending: { label: "Under Review", variant: "secondary" as const },
-      rejected: { label: "Rejected", variant: "destructive" as const },
-      approved: { label: "Published", variant: "default" as const }
-    };
-    
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
-
-  // Don't render if not logged in
-  if (!isLoggedIn) {
-    return null;
-  }
-
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading profile...</p>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8">
-        {/* Profile Header */}
-        <div className="mb-8">
-          <Card className="p-8 bg-gradient-card shadow-medium">
-            <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
-              <Avatar className="h-24 w-24">
-                <AvatarFallback className="text-2xl bg-muted">
-                  <User className="h-12 w-12" />
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-4">
-                  <h1 className="text-3xl font-bold">{displayUser.name}</h1>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/profile/edit">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit Profile
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {displayUser.bio ? (
-                  <p className="text-muted-foreground mb-4 max-w-2xl">{displayUser.bio}</p>
-                ) : (
-                  <p className="text-muted-foreground/60 mb-4 max-w-2xl italic">
-                    No bio available. <Link to="/profile/edit" className="text-primary hover:underline">Add one</Link>
-                  </p>
-                )}
-                
-                <div className="flex flex-wrap gap-6 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Joined:</span>
-                    <span className="ml-2 font-medium">{displayUser.joinedDate}</span>
-                  </div>
-                  {displayUser.location && (
-                    <div>
-                      <span className="text-muted-foreground">Location:</span>
-                      <span className="ml-2 font-medium">{displayUser.location}</span>
+          if (loading) {
+            return (
+              <div className="min-h-screen bg-background">
+                <Header />
+                <main className="container mx-auto px-4 py-8">
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                      <p className="text-muted-foreground">Loading profile...</p>
                     </div>
-                  )}
-                  {displayUser.website && (
-                    <div>
-                      <span className="text-muted-foreground">Website:</span>
-                      <span className="ml-2 font-medium text-primary">{displayUser.website}</span>
-                    </div>
-                  )}
-                  <div>
-                    <span className="text-muted-foreground">Email:</span>
-                    <span className="ml-2 font-medium">{displayUser.email}</span>
                   </div>
-                  {displayUser.isAdmin && (
-                    <div>
-                      <Badge variant="destructive">Admin</Badge>
-                    </div>
-                  )}
-                </div>
+                </main>
               </div>
-            </div>
-            
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8 pt-6 border-t">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{displayUser.stats.articles}</div>
-                <div className="text-sm text-muted-foreground">Articles</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{displayUser.stats.followers.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Followers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{displayUser.stats.following}</div>
-                <div className="text-sm text-muted-foreground">Following</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{displayUser.stats.totalViews.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Views</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{displayUser.stats.totalLikes}</div>
-                <div className="text-sm text-muted-foreground">Total Likes</div>
-              </div>
-            </div>
-          </Card>
-        </div>
+            );
+          }
 
-        {/* Content Tabs */}
-        <Tabs defaultValue="published" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="published" className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              Published Articles
-            </TabsTrigger>
-            <TabsTrigger value="drafts" className="flex items-center gap-2">
-              <Edit className="h-4 w-4" />
-              Drafts & Submissions
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+          const displayUser = {
+            name: profileData?.name || user?.name || "John Doe",
+            email: profileData?.email || user?.email || "john.doe@example.com",
+            bio: profileData?.bio || "",
+            joinedDate: profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "January 2024",
+            location: profileData?.location || "",
+            website: profileData?.website || "",
+            isAdmin: profileData?.isAdmin || false,
+            stats: {
+              articles: profileData?.stats?.articles || 0,
+              totalBlogs: profileData?.stats?.totalBlogs || 0,
+              followers: profileData?.stats?.followers || 0,
+              following: profileData?.stats?.following || 0,
+              totalViews: profileData?.stats?.totalViews || 0,
+              totalLikes: profileData?.stats?.totalLikes || 0
+            }
+          };
+
+          const publishedArticles = userBlogs.filter(blog => blog.status === 'approved');
+          const draftArticles = userBlogs.filter(blog => blog.status === 'pending');
+          const rejectedArticles = userBlogs.filter(blog => blog.status === 'rejected');
               <Heart className="h-4 w-4" />
               Analytics
             </TabsTrigger>
           </TabsList>
           
                     <TabsContent value="published" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Published Articles</h2>
-              <Button variant="gradient">
-              <Link to="/write">Write New Article</Link>
-              </Button>
-            </div>
-            {publishedArticles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {publishedArticles.map((article) => (
-                  <BlogCard 
-                    key={article.id}
-                    id={article.id}
-                    title={article.title}
-                    excerpt={article.excerpt || article.content.substring(0, 150) + '...'}
-                    author={{ name: article.author.name }}
-                    publishedAt={new Date(article.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    readTime={`${article.readTime || Math.ceil(article.content.length / 200)} min read`}
-                    tags={article.tags || []}
-                    likes={article.likes || 0}
-                    comments={article.comments || 0}
-                    views={article.views || 0}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-12 text-center bg-gradient-card shadow-soft">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No published articles yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start writing and sharing your knowledge with the community.
-                </p>
-                <Button variant="gradient" asChild>
-                  <Link to="/write">Write Your First Article</Link>
-                </Button>
-              </Card>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="drafts" className="space-y-6">
-            <h2 className="text-2xl font-bold">Drafts & Submissions</h2>
-            <div className="space-y-4">
-              {/* Pending Articles */}
-              {draftArticles.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Under Review</h3>
-                  {draftArticles.map((article) => (
-                    <Card key={article.id} className="p-6 bg-gradient-card shadow-soft mb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h4 className="text-lg font-semibold">{article.title}</h4>
-                            <StatusBadge status={article.status} />
-                          </div>
-                          <p className="text-muted-foreground mb-3 line-clamp-2">{article.excerpt}</p>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {article.tags?.map((tag: string) => (
-                              <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
-                            ))}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Last modified: {article.lastModified}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+                <div className="mb-8">
+                  <ProfileHeader displayUser={displayUser} />
                 </div>
-              )}
-              
-              {/* Rejected Articles */}
-              {rejectedArticles.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Rejected Articles</h3>
-                  {rejectedArticles.map((article) => (
-                    <Card key={article.id} className="p-6 bg-gradient-card shadow-soft mb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
                             <h4 className="text-lg font-semibold">{article.title}</h4>
                             <StatusBadge status={article.status} />
                           </div>

@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,jsx,css,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}
