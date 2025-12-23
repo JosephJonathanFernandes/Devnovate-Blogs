@@ -1,53 +1,61 @@
 
 # Devnovate Blogs
 
-## Problem Statement
-A modern, modular, and secure blogging platform for teams and individuals. Built for extensibility, security, and professional code quality.
+A professional, modular, and secure fullstack blogging platform built with React, TypeScript, Node.js, and MongoDB.
+
+## Problem
+Modern content platforms require scalable, secure, and maintainable codebases. Devnovate Blogs solves this by providing a recruiter-grade, open-source solution with clear architecture, strong security, and a great developer experience.
 
 ## Architecture
-- **Frontend:** React (Vite, Tailwind CSS)
-- **Backend:** Node.js (Express, MongoDB)
-- **API:** RESTful, modular, and secure
-- **Config:** Environment-driven, no hardcoded secrets
+- **Frontend:** React + TypeScript (Vite, Tailwind CSS)
+- **Backend:** Node.js + Express + TypeScript
+- **Database:** MongoDB (Mongoose)
+- **API:** RESTful, JWT authentication
+- **Testing:** Jest, Supertest (recommended)
+- **CI/CD:** GitHub Actions (recommended)
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
 
 ## Features
-- Modular, scalable codebase (SOLID, Clean Code)
-- Secure by default (GitGuardian compliant)
-- Clear separation of concerns
-- Easy to run, extend, and maintain
-
-## Tech Stack
-- React, TypeScript, Vite, Tailwind CSS
-- Node.js, Express, MongoDB
-- Jest (testing), ESLint, Prettier
+- Modular, SOLID-compliant codebase
+- Secure by default (no hardcoded secrets)
+- User authentication, blog CRUD, comments, likes
+- Admin dashboard, approval workflow
+- Professional documentation and security policies
 
 ## Getting Started
-1. Clone the repo
-2. Copy `.env.example` to `.env` and fill in values
-3. Install dependencies: `npm install` in root, client, and server
-4. Start dev servers:
-   - `npm run dev` (client)
-   - `npm run dev` (server)
+1. **Clone the repo:**
+   ```sh
+   git clone https://github.com/your-org/devnovate-blogs.git
+   cd devnovate-blogs
+   ```
+2. **Install dependencies:**
+   ```sh
+   cd server && npm install
+   cd ../client && npm install
+   ```
+3. **Configure environment:**
+   - Copy `.env.example` to `.env` in both root and client if needed
+   - Fill in all required secrets
+4. **Run the app:**
+   - Start backend: `cd server && npm run dev`
+   - Start frontend: `cd client && npm run dev`
 
-## Testing
-- Add tests in `tests/`
-- Run tests with `npm test`
-- Aim for >80% coverage
-
-## Linting & Formatting
-- Use ESLint and Prettier
-- Recommended: set up pre-commit hooks with lint-staged
-
-## CI/CD
-- See `.github/workflows/ci.yml` for GitHub Actions pipeline example
-
-## Documentation
-- See `docs/` for architecture, contributing, and changelog
+## Usage
+- Access the frontend at `http://localhost:3000`
+- API runs at `http://localhost:5000/api`
 
 ## Value
-- Recruiter- and reviewer-friendly
-- Secure, maintainable, and production-ready
-- Easy onboarding for new contributors
+- Reviewer- and recruiter-friendly
+- Easy to extend, test, and deploy
+- Security and code quality built-in
+
+## Contributing
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+## License
+MIT
 
 ---
-For details, see `docs/ARCHITECTURE.md` and `docs/CONTRIBUTING.md`.
+
+For architecture, contribution, and changelog, see the `docs/` folder.
