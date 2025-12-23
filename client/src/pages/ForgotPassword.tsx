@@ -109,46 +109,34 @@ const ForgotPassword = () => {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-                </div>
-                <h1 className="text-xl sm:text-2xl font-bold mb-2">
-                  Check Your Email
-                </h1>
-                <p className="text-muted-foreground text-sm sm:text-base">
-                  We've sent a password reset link to <strong>{email}</strong>
-                </p>
-              </div>
 
-              <div className="bg-muted/50 rounded-lg p-3 sm:p-4">
-                <h3 className="font-medium mb-2 text-sm sm:text-base">Didn't receive the email?</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-                  Check your spam folder or try resending the reset link.
-                </p>
-                <Button 
-                  onClick={handleResend}
-                  variant="outline" 
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending..." : "Resend Reset Link"}
-                </Button>
-              </div>
+                  import React from "react";
+                  import { ForgotPasswordForm } from "@/components/ForgotPasswordForm";
+                  import { useForgotPassword } from "@/hooks/useForgotPassword";
 
-              <div className="text-center">
-                <Link 
-                  to="/login" 
-                  className="inline-flex items-center text-sm text-primary hover:underline"
-                >
+                  const ForgotPassword: React.FC = () => {
+                    const {
+                      email,
+                      setEmail,
+                      isSubmitted,
+                      isLoading,
+                      handleSubmit,
+                      handleResend,
+                    } = useForgotPassword();
+
+                    return (
+                      <div className="w-full max-w-sm sm:max-w-md mx-auto flex flex-col justify-center min-h-screen py-8">
+                        <ForgotPasswordForm
+                          email={email}
+                          setEmail={setEmail}
+                          isSubmitted={isSubmitted}
+                          isLoading={isLoading}
+                          handleSubmit={handleSubmit}
+                          handleResend={handleResend}
+                        />
+                      </div>
+                    );
+                  };
+
+                  export default ForgotPassword;
                   <ArrowLeft className="h-4 w-4 mr-1" />
-                  Back to Sign In
-                </Link>
-              </div>
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default ForgotPassword;
