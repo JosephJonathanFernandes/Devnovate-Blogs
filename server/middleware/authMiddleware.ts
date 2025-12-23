@@ -1,14 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-
-interface AuthRequest extends Request {
-    userId?: string;
-}
+import { Response, NextFunction } from 'express';
+import { AuthRequest, verifyJwtService, getTokenFromCookies } from '../services/authMiddlewareService';
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         // Get token from cookie
-        const token = req.cookies.token;
+        const token = getTokenFromCookies(req);
 
         if (!token) {
             return res.status(401).json({
@@ -18,9 +14,9 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
         }
 
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        const secret = process.env.JWT_SECRET!;
+        const decoded = verifyJwtService(token, secret);
         req.userId = decoded.userId;
-        
         next();
     } catch (error) {
         return res.status(401).json({

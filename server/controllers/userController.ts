@@ -1,65 +1,16 @@
-// import { Request, Response } from 'express';
-// import User from '../models/usermodel';
-// import Blog from '../models/blogmodel';
+import { Request, Response } from 'express';
+import { getCurrentUserService } from '../services/userService';
 
-// // GET /api/users/me - returns current authenticated user (minus sensitive fields)
-// export const getCurrentUser = async (req: Request, res: Response) => {
-//   try {
-//     const userId = (req as any).userId;
-//     if (!userId) {
-//       return res.status(401).json({ success: false, message: 'Unauthorized' });
-//     }
-
-//     const user = await User.findById(userId).select('-password -verifyOtp -resetOtp');
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: 'User not found' });
-//     }
-
-//     // Get user statistics
-//     const totalBlogs = await Blog.countDocuments({ user_id: userId });
-//     const approvedBlogs = await Blog.countDocuments({ user_id: userId, status: 'approved' });
-    
-//     // Get total views and likes from user's approved blogs
-//     const blogStats = await Blog.aggregate([
-//       { $match: { user_id: userId, status: 'approved' } },
-//       {
-//         $group: {
-//           _id: null,
-//           totalViews: { $sum: '$views' },
-//           totalLikes: { $sum: { $size: '$likes_coll' } }
-//         }
-//       }
-//     ]);
-
-//     const stats = blogStats[0] || { totalViews: 0, totalLikes: 0 };
-
-//     return res.status(200).json({
-//       success: true,
-//       user: {
-//         id: user._id,
-//         name: user.name,
-//         email: user.email,
-//         bio: user.bio,
-//         location: user.location,
-//         website: user.website,
-//         isAdmin: user.isAdmin,
-//         isAccountVerified: user.isAccountVerified,
-//         createdAt: user.createdAt,
-//         stats: {
-//           articles: approvedBlogs,
-//           totalBlogs: totalBlogs,
-//           totalViews: stats.totalViews,
-//           totalLikes: stats.totalLikes,
-//           followers: 0, // TODO: Implement follower system
-//           following: 0  // TODO: Implement following system
-//         }
-//       }
-//     });
-//   } catch (error) {
-//     console.error('getCurrentUser error:', error);
-//     return res.status(500).json({ success: false, message: 'Internal server error' });
-//   }
-// };
+export const getCurrentUser = async (req: Request, res: Response) => {
+	try {
+		const userId = (req as any).userId;
+		if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+		const user = await getCurrentUserService(userId);
+		return res.status(200).json({ success: true, user });
+	} catch (error: any) {
+		return res.status(404).json({ success: false, message: error.message || 'User not found' });
+	}
+};
 
 // // PUT /api/users/me - update current user profile
 // export const updateUserProfile = async (req: Request, res: Response) => {

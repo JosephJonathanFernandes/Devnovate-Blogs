@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { uploadFileService } from '../services/uploadService';
 
 // Configure multer for image uploads
 const storage = multer.diskStorage({
@@ -50,4 +51,13 @@ export const uploadImage = async (req: Request, res: Response) => {
   }
 };
 
+// // POST /api/upload - handle file upload
+export const uploadFile = async (req: Request, res: Response) => {
+  try {
+    const { url } = await uploadFileService(req);
+    return res.status(200).json({ success: true, url });
+  } catch (error: any) {
+    return res.status(400).json({ success: false, message: error.message || 'File upload failed' });
+  }
+};
 export { upload };
